@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cameron Nayeri</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;1,300&family=DM+Sans:wght@300;400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0d0d0c;
+    --ink: #e8e5de;
+    --mid: #5a5854;
+    --line: #232220;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container { max-width: 1080px; margin: 0 auto; padding: 0 2rem; }
+
+  /* ── HEADER ── */
+  header {
+    padding: 1.75rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .logo {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: clamp(1rem, 2.2vw, 1.45rem);
+    letter-spacing: -.02em;
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: .25em;
+    cursor: pointer;
+  }
+
+  .header-right { display: flex; align-items: baseline; gap: 2.5rem; }
+  nav { display: flex; gap: 2.5rem; }
+
+  nav a, .resume-btn {
+    font-size: .7rem;
+    letter-spacing: .05em;
+    color: var(--mid);
+    text-decoration: none;
+    transition: color .2s;
+    cursor: pointer;
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  nav a:hover, .resume-btn:hover { color: var(--ink); }
+
+  /* ── VIEWS ── */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* ── WORK ── */
+  #work { padding: 3rem 0; }
+
+  .section-label {
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--mid);
+    margin-bottom: 1rem;
+  }
+
+  .project-list { border-top: 1px solid var(--line); }
+
+  .project-row {
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    gap: 0 2rem;
+    align-items: baseline;
+    padding: 1.15rem 0;
+    border-bottom: 1px solid var(--line);
+    cursor: none;
+    user-select: none;
+    transition: border-color .2s;
+  }
+  .project-row.open { border-bottom-color: transparent; }
+
+  .project-num { font-size: .7rem; color: var(--mid); letter-spacing: .02em; }
+
+  .project-name {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: clamp(1rem, 2.2vw, 1.45rem);
+    letter-spacing: -.02em;
+    line-height: 1;
+  }
+
+  .project-type {
+    font-size: .7rem;
+    letter-spacing: .06em;
+    color: var(--mid);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* ── ACCORDION PANEL ── */
+  .project-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .6s cubic-bezier(.25,1,.5,1);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .panel-inner { padding: 2rem 0 3rem; }
+
+  .image-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+    margin-bottom: 2rem;
+  }
+
+  .img-slot { display: block; overflow: hidden; width: 100%; }
+  .img-slot.wide { grid-column: span 2; }
+  .img-slot.solo { grid-column: span 2; max-width: 60%; }
+
+  .img-slot img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .img-slot iframe {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border: none;
+    display: block;
+  }
+
+  .panel-desc {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: .88rem;
+    line-height: 1.7;
+    color: var(--mid);
+    max-width: 55ch;
+  }
+
+  /* ── CUSTOM CURSOR ── */
+  #arrow-cursor {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity .12s;
+    font-size: 1.1rem;
+    color: var(--ink);
+    line-height: 1;
+    transform: translate(-50%, -50%);
+  }
+  #arrow-cursor.visible { opacity: 1; }
+
+  /* ── CONTACT ── */
+  #contact {
+    padding: 3rem 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+
+  .contact-left { font-size: .7rem; letter-spacing: .08em; text-transform: uppercase; color: var(--mid); }
+
+  .contact-links { display: flex; gap: 2.5rem; }
+  .contact-links a {
+    font-size: .7rem;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--mid);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .contact-links a:hover { color: var(--ink); }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+  }
+  footer span { font-size: .7rem; letter-spacing: .05em; color: var(--mid); text-transform: uppercase; }
+
+  .blink {
+    display: inline-block;
+    width: .45em; height: .82em;
+    background: var(--mid);
+    margin-left: .15em;
+    vertical-align: middle;
+    animation: blink 1.1s step-start infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* ── ABOUT VIEW ── */
+  .sub-header {
+    padding: 1.75rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .back-btn {
+    font-size: .7rem;
+    letter-spacing: .05em;
+    color: var(--mid);
+    cursor: pointer;
+    background: none;
+    border: none;
+    font-family: 'DM Mono', monospace;
+    font-weight: 300;
+    padding: 0;
+    transition: color .2s;
+  }
+  .back-btn:hover { color: var(--ink); }
+
+  .about-body {
+    padding: 3rem 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .about-text {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: clamp(.95rem, 1.5vw, 1.15rem);
+    line-height: 1.65;
+    letter-spacing: -.01em;
+    color: var(--ink);
+  }
+
+  .about-details { display: flex; flex-direction: column; gap: 1.5rem; }
+
+  .detail-label {
+    font-size: .7rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--mid);
+    display: block;
+    margin-bottom: .2rem;
+  }
+
+  .detail-value { font-size: .7rem; color: var(--ink); line-height: 1.65; letter-spacing: .02em; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 700px) {
+    .about-body { grid-template-columns: 1fr; gap: 2.5rem; }
+    .project-row { grid-template-columns: 2rem 1fr; }
+    .project-type { display: none; }
+    .image-grid { grid-template-columns: 1fr; }
+    .img-slot.wide, .img-slot.solo { grid-column: span 1; max-width: 100%; }
+    #contact { flex-direction: column; gap: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="arrow-cursor">↓</div>
+
+<div class="container">
+
+  <header>
+    <span class="logo" onclick="goMain()">Cameron Nayeri</span>
+    <div class="header-right">
+      <nav>
+        <a onclick="goMain()">Work</a>
+        <a onclick="goAbout()">About</a>
+        <a onclick="goContact()">Contact</a>
+      </nav>
+      <a class="resume-btn" href="https://freight.cargo.site/m/I2718947983347106390499613399397/CameronNayeri_Resume_2026_A.pdf" target="_blank">Resume ↓</a>
+    </div>
+  </header>
+
+  <!-- ══ MAIN VIEW ══ -->
+  <div id="view-main" class="view active">
+
+    <section id="work">
+      <div class="section-label">Work</div>
+      <div class="project-list">
+
+        <!-- 01 EMBR -->
+        <div class="project-row" id="row-0" onclick="toggleProject(0)">
+          <span class="project-num">01</span>
+          <span class="project-name">Embr</span>
+          <span class="project-type">Brand & Packaging</span>
+        </div>
+        <div class="project-panel" id="panel-0">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/m/W2392147712095355919672815573349/embr_image1.png" alt="Embr"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/m/Y2392147771844359974418053257573/embr_image2.png" alt="Embr"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/m/Y2392147815581590173183400139109/embr_image3.png" alt="Embr"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/m/O2392147842384709312283378637157/embr_image4.png" alt="Embr"></div>
+            </div>
+            <p class="panel-desc">Branding and packaging system for a luxury candle line that emphasizes mood, ritual, and ingredients. The identity pairs warm gradients, raw ingredient imagery, and restrained typography to create a bold yet refined sensory experience.</p>
+          </div>
+        </div>
+
+        <!-- 02 SCRAWL -->
+        <div class="project-row" id="row-1" onclick="toggleProject(1)">
+          <span class="project-num">02</span>
+          <span class="project-name">Scrawl</span>
+          <span class="project-type">Identity & Motion</span>
+        </div>
+        <div class="project-panel" id="panel-1">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/i/C2396592190424479010623753738597/scrawlhero_compressed.gif" alt="Scrawl"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/U2396592392139625456637700659557/scrawl_museum_mockup_7.png" alt="Scrawl"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/F2396592890257055679016722946405/scrawl_stationery3-3.png" alt="Scrawl"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/X2396592997783126884669699316069/scrawl_shirts2-1.png" alt="Scrawl"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/X2396593160298942174050849053029/scrawl-tote2-4.png" alt="Scrawl"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/i/L2396593427352456129144027797861/scrawl_website_mockup_2-4.png" alt="Scrawl"></div>
+            </div>
+            <p class="panel-desc">Identity and motion system for The Pencil Museum, rebranded as Scrawl. The design celebrates raw, unfiltered creativity through bold mark-making and playful, tactile elements.</p>
+          </div>
+        </div>
+
+        <!-- 03 WHITE WIZARD -->
+        <div class="project-row" id="row-2" onclick="toggleProject(2)">
+          <span class="project-num">03</span>
+          <span class="project-name">White Wizard</span>
+          <span class="project-type">Identity & Packaging</span>
+        </div>
+        <div class="project-panel" id="panel-2">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/w/1000/i/Q2396599832947442236638407350629/Wizard2_mainshot_YELLOW_cycles.png" alt="White Wizard"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/B2653308253021855188291140901221/Wizard2_XL2_YELLOW_cycles.png" alt="White Wizard"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/F2396599785299502294246635526501/Wizard2_XL1_cycles_1920.png" alt="White Wizard"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/w/1000/i/V2653308321053447332131967261029/Wizard2_flat_cycles_2.png" alt="White Wizard"></div>
+            </div>
+            <p class="panel-desc">Playful identity and packaging system for a correction pen made for artists. The design leans into playful typography, messy marks, and a sense of magic.</p>
+          </div>
+        </div>
+
+        <!-- 04 MEND IT -->
+        <div class="project-row" id="row-3" onclick="toggleProject(3)">
+          <span class="project-num">04</span>
+          <span class="project-name">Mend It!</span>
+          <span class="project-type">Campaign</span>
+        </div>
+        <div class="project-panel" id="panel-3">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/t/original/i/F2396601196696784861911848769893/Mendit-Header-Gif.gif" alt="Mend It!"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/t/original/i/D2396601272439116028563267705189/mend-it-site-hero.png" alt="Mend It!"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/t/original/i/D2396601346373666275991150582117/Mendit-Poster-Mockup.png" alt="Mend It!"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/t/original/i/C2396601463971659745889542134117/mend-it-website-1_1.png" alt="Mend It!"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/t/original/i/G2396601506214703674684415334757/mend-it-website-2.png" alt="Mend It!"></div>
+            </div>
+            <p class="panel-desc">Campaign identity celebrating sustainable ownership and repair culture, centered on bold, patchwork-inspired graphics. The design leans into playful typography, vector textures, and an uplifting narrative of care, reuse, and creative renewal.</p>
+          </div>
+        </div>
+
+        <!-- 05 MOVIEQLUE -->
+        <div class="project-row" id="row-4" onclick="toggleProject(4)">
+          <span class="project-num">05</span>
+          <span class="project-name">Movieqlue</span>
+          <span class="project-type">Identity & Animation</span>
+        </div>
+        <div class="project-panel" id="panel-4">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/w/1000/i/Q2698513442057440961202761685349/qlue-animation-header-short.gif" alt="Movieqlue"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/L2698512377090012097802927790437/movieqlue-logotype2x.png" alt="Movieqlue"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/E2698512741320973833198024448357/movieqlue-colors2x.png" alt="Movieqlue"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/P2698512900258120772279521171813/movieqlue-icons2x.png" alt="Movieqlue"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/G2698513031082429743027661232485/qlue-animation-icons.gif" alt="Movieqlue"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/w/1000/i/J2698513080538150604642969114981/qlue-tshirts.png" alt="Movieqlue"></div>
+            </div>
+            <p class="panel-desc">Brand identity, animation, and icon illustration for a movie guessing web game. The vibrant colors on stark black evoke the feeling of movies in a dark theater, while gentle, rounded corners match its web-based environment.</p>
+          </div>
+        </div>
+
+        <!-- 06 AFFINI-T -->
+        <div class="project-row" id="row-5" onclick="toggleProject(5)">
+          <span class="project-num">06</span>
+          <span class="project-name">Affini-T</span>
+          <span class="project-type">Environmental</span>
+        </div>
+        <div class="project-panel" id="panel-5">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/w/1000/i/C2396622617443384878991085853029/affiniT-pics1.png" alt="Affini-T"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/K2396622700545966931052615883109/affinit-crop5.png" alt="Affini-T"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/Q2396622947732337518760607537509/affinit-crop4.png" alt="Affini-T"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/Z2396622998719138138493808204133/affiniT-pic6.png" alt="Affini-T"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/I2396623048820495042688950393189/affiniT-pics2.png" alt="Affini-T"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/w/1000/i/N2396623097538346141355876211045/affiniT-pics4.png" alt="Affini-T"></div>
+            </div>
+            <p class="panel-desc">Environmental and signage program for Affini-T's headquarters in Watertown. Done in collaboration with the team at Selbert Perkins Design. Affini-T Therapeutics is a biotech firm harnessing T-cell therapies to cure cancer.</p>
+          </div>
+        </div>
+
+        <!-- 07 MILLERKNOLL -->
+        <div class="project-row" id="row-6" onclick="toggleProject(6)">
+          <span class="project-num">07</span>
+          <span class="project-name">MillerKnoll</span>
+          <span class="project-type">Identity & Motion</span>
+        </div>
+        <div class="project-panel" id="panel-6">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/w/1000/i/W2398002262732760093501033208165/millerknoll-headeranimation.gif" alt="MillerKnoll"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/X2398002346093596562594496960869/MillerKnoll-Branding-20.jpg" alt="MillerKnoll"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/w/1000/i/G2398002511653124624137722714469/millerknoll-community.gif" alt="MillerKnoll"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/w/1000/i/T2398002552291301818519864924517/millerknollworksustainably.gif" alt="MillerKnoll"></div>
+            </div>
+            <p class="panel-desc">Identity design and animations for MillerKnoll's sub-brand Workplace Research Library, celebrating community and sustainable practices.</p>
+          </div>
+        </div>
+
+        <!-- 08 SEEIN MATCHA -->
+        <div class="project-row" id="row-7" onclick="toggleProject(7)">
+          <span class="project-num">08</span>
+          <span class="project-name">Seein Matcha</span>
+          <span class="project-type">Packaging</span>
+        </div>
+        <div class="project-panel" id="panel-7">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/i/C2397995666121739102744246671717/Main-Mockup.png" alt="Seein Matcha"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/C2397995752932116713621396576613/Second-Mockup_lowres_thin.png" alt="Seein Matcha"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/H2397995799491698755664304855397/Third-Mockup.png" alt="Seein Matcha"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/i/Z2397995838801710376739359349093/matcha_box_render1.png" alt="Seein Matcha"></div>
+            </div>
+            <p class="panel-desc">Redesign of an instant matcha powder box and juice box style matcha beverages.</p>
+          </div>
+        </div>
+
+        <!-- 09 COVER -->
+        <div class="project-row" id="row-8" onclick="toggleProject(8)">
+          <span class="project-num">09</span>
+          <span class="project-name">Cover</span>
+          <span class="project-type">Design System</span>
+        </div>
+        <div class="project-panel" id="panel-8">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/i/L2398005060734901193765822323045/cover_gif1.gif" alt="Cover"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/E2398005313953357093576837355877/VIEW-OUTGOING-PROJECT.png" alt="Cover"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/Z2398006720259338296898214353253/PROJECT-PROGRESS.png" alt="Cover"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/F2398006901443258588873430325605/cover_gif2.gif" alt="Cover"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/R2398007317528017915466076576101/cover_gif3.gif" alt="Cover"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/i/C2398007360693399047946427357541/MY-INBOX--2.png" alt="Cover"></div>
+            </div>
+            <p class="panel-desc">Design system and mock-up for a start-up aiming to bring together musicians and visual artists to collaborate.</p>
+          </div>
+        </div>
+
+        <!-- 10 METICULOUS HUMOR -->
+        <div class="project-row" id="row-9" onclick="toggleProject(9)">
+          <span class="project-num">10</span>
+          <span class="project-name">Meticulous Humor</span>
+          <span class="project-type">Editorial</span>
+        </div>
+        <div class="project-panel" id="panel-9">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot wide"><img src="https://freight.cargo.site/i/B2398009865890371466219503671653/adrianinterview-mockup1.png" alt="Meticulous Humor"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/J2398009935526830344473061022053/adrianinterview-mockup2.png" alt="Meticulous Humor"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/A2398009970852345245626852366693/adrianinterview-mockup3.png" alt="Meticulous Humor"></div>
+            </div>
+            <p class="panel-desc">Editorial interview with fine artist Adrian Ocone.</p>
+          </div>
+        </div>
+
+        <!-- 11 MADVILLAINY -->
+        <div class="project-row" id="row-10" onclick="toggleProject(10)">
+          <span class="project-num">11</span>
+          <span class="project-name">Madvillainy</span>
+          <span class="project-type">Print</span>
+        </div>
+        <div class="project-panel" id="panel-10">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot"><img src="https://freight.cargo.site/i/R2398025619926319248240451180901/MV-Book-Scan1.png" alt="Madvillainy"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/K2398025682165633752936478333285/MV-Book-Scan2.png" alt="Madvillainy"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/C2398025718376592369628328155493/MV-Book-Scan3.png" alt="Madvillainy"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/F2398025751267137053052458686821/MV-Book-Scan4.png" alt="Madvillainy"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/P2398025780892608035429998582117/MV-Book-Scan5.png" alt="Madvillainy"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/B2398025814410342017360253868389/MV-Book-Scan6.png" alt="Madvillainy"></div>
+              <div class="img-slot wide"><img src="https://freight.cargo.site/i/P2398025844367854393064565692773/MV-Book-Scan7.png" alt="Madvillainy"></div>
+            </div>
+            <p class="panel-desc">Lyric booklet for MF DOOM and Madlib's Madvillainy. The contents include album lyrics, images, and a Pitchfork article.</p>
+          </div>
+        </div>
+
+        <!-- 12 LUCKY BLACK CAT -->
+        <div class="project-row" id="row-11" onclick="toggleProject(11)">
+          <span class="project-num">12</span>
+          <span class="project-name">Lucky Black Cat</span>
+          <span class="project-type">Motion</span>
+        </div>
+        <div class="project-panel" id="panel-11">
+          <div class="panel-inner">
+            <div class="image-grid">
+              <div class="img-slot"><img src="https://freight.cargo.site/i/K2398033345016908948179057826149" alt="Lucky Black Cat"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/P2398033497387014997019954174309" alt="Lucky Black Cat"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/W2398033739869465845932010166629" alt="Lucky Black Cat"></div>
+              <div class="img-slot"><img src="https://freight.cargo.site/i/L2398033839242076171005364722021" alt="Lucky Black Cat"></div>
+              <div class="img-slot wide">
+                <iframe src="https://www.youtube.com/embed/vbCOWetLidk" allowfullscreen title="Lucky Black Cat"></iframe>
+              </div>
+            </div>
+            <p class="panel-desc">A series of PSAs meant to dispel stereotypes about black cats.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section id="contact">
+      <span class="contact-left">Contact</span>
+      <div class="contact-links">
+        <a href="mailto:cameronnayeri@gmail.com">Email</a>
+      </div>
+    </section>
+
+    <footer>
+      <span>© 2026 Cameron Nayeri</span>
+      <span>Available<span class="blink"></span></span>
+    </footer>
+
+  </div><!-- /view-main -->
+
+  <!-- ══ ABOUT VIEW ══ -->
+  <div id="view-about" class="view">
+    <div class="sub-header">
+      <button class="back-btn" onclick="goMain()">← Work</button>
+      <span style="font-size:.7rem;letter-spacing:.05em;color:var(--mid)">About</span>
+    </div>
+    <div class="about-body">
+      <p class="about-text">
+        Graphic designer born and raised in the greater Boston area. Born illustrator, turned graphic artist. I am interested in anything and everything I can express my ideas through — growing up surrounded by a family of computer scientists pushed my early interest in drawing and painting into the digital realm.<br><br>
+        I love working on projects relating to branding. Especially those where I can use my spatial strengths to solve problems.
+      </p>
+      <div class="about-details">
+        <div>
+          <span class="detail-label">Based in</span>
+          <span class="detail-value">Greater Boston Area</span>
+        </div>
+        <div>
+          <span class="detail-label">Discipline</span>
+          <span class="detail-value">Branding, Identity, Packaging,<br>Motion, Illustration</span>
+        </div>
+        <div>
+          <span class="detail-label">Software</span>
+          <span class="detail-value">Photoshop, Illustrator, InDesign,<br>After Effects, Blender, Figma, Midjourney</span>
+        </div>
+        <div>
+          <span class="detail-label">Contact</span>
+          <span class="detail-value"><a href="mailto:cameronnayeri@gmail.com" style="color:var(--ink);text-decoration:none;border-bottom:1px solid var(--line)">cameronnayeri@gmail.com</a></span>
+        </div>
+      </div>
+    </div>
+    <footer>
+      <span>© 2026 Cameron Nayeri</span>
+      <span>Available<span class="blink"></span></span>
+    </footer>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+  // ── VIEW ROUTING ──
+  function showView(name) {
+    document.querySelectorAll('.view').forEach(function(v) { v.classList.remove('active'); });
+    document.getElementById('view-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+  function goMain()  { showView('main'); }
+  function goAbout() { showView('about'); }
+  function goContact() {
+    showView('main');
+    setTimeout(function() {
+      var el = document.getElementById('contact');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 20);
+  }
+
+  // ── ACCORDION ──
+  var openIndex = null;
+  var cursor = document.getElementById('arrow-cursor');
+
+  function toggleProject(i) {
+    playClick();
+    var panel = document.getElementById('panel-' + i);
+    var row   = document.getElementById('row-' + i);
+    var isOpen = openIndex === i;
+
+    // close current
+    if (openIndex !== null) {
+      document.getElementById('panel-' + openIndex).style.maxHeight = '0px';
+      document.getElementById('row-'   + openIndex).classList.remove('open');
+    }
+
+    if (isOpen) {
+      openIndex = null;
+      cursor.textContent = '↓';
+    } else {
+      openIndex = i;
+      row.classList.add('open');
+      cursor.textContent = '↑';
+
+      // set initial height, update as images load
+      panel.style.maxHeight = panel.scrollHeight + 'px';
+      panel.querySelectorAll('img').forEach(function(img) {
+        if (!img.complete) {
+          img.addEventListener('load', function() {
+            if (openIndex === i) {
+              panel.style.maxHeight = panel.scrollHeight + 'px';
+            }
+          });
+        }
+      });
+    }
+  }
+
+  // ── CLICK SOUND ──
+  var _ctx;
+  function getCtx() {
+    if (!_ctx) {
+      var A = window.AudioContext || window.webkitAudioContext;
+      if (A) _ctx = new A();
+    }
+    return _ctx;
+  }
+  function playClick() {
+    var ctx = getCtx();
+    if (!ctx) return;
+    var t   = ctx.currentTime;
+    var len = Math.floor(ctx.sampleRate * 0.04);
+    var buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    var d   = buf.getChannelData(0);
+    for (var j = 0; j < len; j++) {
+      d[j] = (Math.random() * 2 - 1) * Math.pow(1 - j / len, 5);
+    }
+    var src    = ctx.createBufferSource();
+    src.buffer = buf;
+    var gain   = ctx.createGain();
+    gain.gain.setValueAtTime(0.55, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
+    var filt   = ctx.createBiquadFilter();
+    filt.type  = 'lowpass';
+    filt.frequency.value = 4000;
+    src.connect(filt);
+    filt.connect(gain);
+    gain.connect(ctx.destination);
+    src.start(t);
+  }
+
+  // ── CUSTOM CURSOR ──
+  document.querySelectorAll('.project-row').forEach(function(row) {
+    row.addEventListener('mouseenter', function() { cursor.classList.add('visible'); });
+    row.addEventListener('mouseleave', function() { cursor.classList.remove('visible'); });
+    row.addEventListener('mousemove',  function(e) {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+  });
+</script>
+</body>
+</html>
